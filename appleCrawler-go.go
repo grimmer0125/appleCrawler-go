@@ -68,9 +68,12 @@ func main() {
 
 	fmt.Println("main server start")
 
+	// https://golang.org/doc/articles/wiki/
 	http.HandleFunc("/", handler)
 	http.ListenAndServe(":8080", nil)
 	fmt.Println("already start server")
+
+	ticker.Stop()
 
 	fmt.Println("main end")
 }
