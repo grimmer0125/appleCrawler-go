@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/testgo.iml" filepath="$PROJECT_DIR$/testgo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/appleCrawler-go.iml" filepath="$PROJECT_DIR$/appleCrawler-go.iml" />
     </modules>
   </component>
 </project>
