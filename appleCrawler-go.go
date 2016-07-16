@@ -1,6 +1,26 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+	"runtime"
+	"strconv"
+	"strings"
+	"time"
+)
+
+// for debugging, may influence cpu and have side effect
+// http://webcache.googleusercontent.com/search?q=cache:2iyEKmfEot0J:colobu.com/2016/04/01/how-to-get-goroutine-id/+&cd=2&hl=zh-TW&ct=clnk&gl=tw
+func GoID() int {
+	var buf [64]byte
+	n := runtime.Stack(buf[:], false)
+	idField := strings.Fields(strings.TrimPrefix(string(buf[:n]), "goroutine "))[0]
+	id, err := strconv.Atoi(idField)
+	if err != nil {
+		panic(fmt.Sprintf("cannot get goroutine id: %v", err))
+	}
+	return id
+}
 
 // func (s *Selection) Each(f func(int, *Selection)) *Selection {
 // 	for i, n := range s.Nodes {
@@ -19,12 +39,38 @@ func printSlice(s []*Mac) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
 
-func main() {
-	// StartCrawer()
-	// TestFunctions()
-	// testList()
+func handler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+	fmt.Println("get request")
+
+	// fmt.Println("in handler, its id:", GoID())
+
+}
+
+func launchCrawer() {
 	StartCrawer(func(macs []Mac) {
 		fmt.Println("get callback:", macs)
 	})
+}
+
+func main() {
+	// fmt.Println("in main, its id:", GoID())
+
+	launchCrawer()
+
+	ticker := time.NewTicker(time.Second * 60 * 12)
+	go func() {
+		for t := range ticker.C {
+			fmt.Println("Tick at", t)
+			launchCrawer()
+		}
+	}()
+
+	fmt.Println("main server start")
+
+	http.HandleFunc("/", handler)
+	http.ListenAndServe(":8080", nil)
+	fmt.Println("already start server")
+
 	fmt.Println("main end")
 }

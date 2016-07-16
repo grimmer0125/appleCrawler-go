@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -15,7 +14,6 @@ import (
 // 	return s
 // }
 func StartCrawer(handler func(macs []Mac)) {
-	fmt.Println("in another file")
 	doc, err := goquery.NewDocument("http://www.apple.com/tw/shop/browse/home/specialdeals/mac")
 	if err != nil {
 		log.Fatal(err)
