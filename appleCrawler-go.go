@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/lib/pq" //why _ ?
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -30,6 +29,8 @@ type Mac struct {
 }
 
 var bot *linebot.Client
+
+// var pg_url string
 
 //
 var (

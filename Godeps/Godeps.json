@@ -1,0 +1,38 @@
+{
+	"ImportPath": "github.com/grimmer0125/appleCrawler-go",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v74",
+	"Deps": [
+		{
+			"ImportPath": "github.com/PuerkitoBio/goquery",
+			"Comment": "v0.3.2-93-gf0d7573",
+			"Rev": "f0d75731e0db647903c8611d00c7b85002751317"
+		},
+		{
+			"ImportPath": "github.com/andybalholm/cascadia",
+			"Rev": "3ad29d1ad1c4f2023e355603324348cf1f4b2d48"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-107-g4dd446e",
+			"Rev": "4dd446efc17690bc53e154025146f73203b18309"
+		},
+		{
+			"ImportPath": "github.com/lib/pq/oid",
+			"Comment": "go1.0-cutoff-107-g4dd446e",
+			"Rev": "4dd446efc17690bc53e154025146f73203b18309"
+		},
+		{
+			"ImportPath": "github.com/line/line-bot-sdk-go/linebot",
+			"Rev": "8635ae812e60724b61ee9f0f9d9bf5c43a49f306"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html",
+			"Rev": "e90d6d0afc4c315a0d87a568ae68577cc15149a0"
+		},
+		{
+			"ImportPath": "golang.org/x/net/html/atom",
+			"Rev": "e90d6d0afc4c315a0d87a568ae68577cc15149a0"
+		}
+	]
+}
