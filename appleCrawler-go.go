@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/lib/pq" //why _ ?
+	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 // for debugging, may influence cpu and have side effect
@@ -85,8 +86,18 @@ func checkErr(err error) {
 	}
 }
 
+var bot *linebot.Client
+
+//
+var (
+	channelID     int64 = 0
+	channelSecret       = "0"
+	channelMID          = "0"
+)
+
 func main() {
 
+	// fmt.Println("channelid,", channelID)
 	// for testing
 	// MacInfoGroup, err := GetAllAppleInfo()
 	// checkErr(err)
@@ -103,6 +114,14 @@ func main() {
 		}
 	}()
 
+	// for testing
+	// grimmerID := "0"
+	// bot, _ := linebot.NewClient(channelID, channelSecret, channelMID)
+	// _, err := bot.SendText([]string{grimmerID}, "test")
+	// if err != nil {
+	// 	fmt.Println("send fail, ", err)
+	// }
+
 	fmt.Println("main server start")
 
 	// https://golang.org/doc/articles/wiki/
@@ -110,7 +129,11 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 	fmt.Println("already start server")
 
-	ticker.Stop()
+	// http.HandleFunc("/callback", callbackHandler)
+	// port := os.Getenv("PORT")
+	// addr := fmt.Sprintf(":%s", port)
+	// http.ListenAndServe(addr, nil)
 
+	ticker.Stop()
 	fmt.Println("main end")
 }
