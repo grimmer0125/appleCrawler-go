@@ -77,6 +77,12 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				log.Println(err)
 			}
+
+			// send apple message back
+			macs, err := GetAllAppleInfo()
+			checkErr(err)
+			summaryStr := convertMacInfoToString(macs)
+			_, err = bot.SendText([]string{content.From}, summaryStr)
 		}
 	}
 }
@@ -116,7 +122,7 @@ func launchCrawer() {
 	// })
 }
 
-func broadcastUpdatedInfo(userList []string, macList []Mac) {
+func convertMacInfoToString(macList []Mac) string {
 	summaryStr := "蘋果特價品更新:" + "\n\n"
 	numberOfMacs := len(macList)
 	for i, mac := range macList {
@@ -127,6 +133,12 @@ func broadcastUpdatedInfo(userList []string, macList []Mac) {
 		}
 	}
 	fmt.Println("new summary macs:", summaryStr)
+
+	return summaryStr
+}
+
+func broadcastUpdatedInfo(userList []string, macList []Mac) {
+	summaryStr := convertMacInfoToString(macList)
 
 	fmt.Println("broadcast to:", userList)
 
@@ -173,6 +185,12 @@ func main() {
 	if err != nil {
 		fmt.Println("Wrong environment setting about ChannelID")
 	}
+
+	// fmt.Println("numid:", numID)
+	// fmt.Println("secret:", os.Getenv("channelSecret"))
+	// describe(os.Getenv("channelSecret"))
+	// fmt.Println("channelMID:", os.Getenv("channelMID"))
+
 	// var err error
 	bot, err = linebot.NewClient(numID, os.Getenv("channelSecret"), os.Getenv("channelMID"))
 	checkErr(err)
