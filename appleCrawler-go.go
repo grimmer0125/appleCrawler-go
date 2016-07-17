@@ -90,7 +90,7 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if content != nil && content.IsOperation && content.OpType == linebot.OpTypeAddedAsFriend {
 				// InsertUserID
-				InsertUserID(content.From)
+				InsertUserID(result.RawContent.Params[0])
 			}
 		}
 	}
