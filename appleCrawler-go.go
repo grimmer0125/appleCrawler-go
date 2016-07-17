@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -10,6 +11,31 @@ import (
 
 	_ "github.com/lib/pq" //why _ ?
 	"github.com/line/line-bot-sdk-go/linebot"
+)
+
+// postgres:///grimmer
+
+type User struct {
+	id   string
+	name string
+}
+
+type Mac struct {
+	SpecsTitle string `json:"specsTitle"`
+	SpecsURL   string `json:"specsURL"`
+	Price      string `json:"price"`
+	// 	ImageURL    string `json:"imageURL"`
+	// 	SpecsDetail string `json:"specsDetail"`
+
+}
+
+var bot *linebot.Client
+
+//
+var (
+	channelID     int64 = 0
+	channelSecret       = "0"
+	channelMID          = "0"
 )
 
 // for debugging, may influence cpu and have side effect
@@ -25,19 +51,6 @@ func GoID() int {
 	return id
 }
 
-// func (s *Selection) Each(f func(int, *Selection)) *Selection {
-// 	for i, n := range s.Nodes {
-// 		f(i, newSingleSelection(n, s.document))
-// 	}
-// 	return s
-// }
-
-type Mac struct {
-	title string
-	url   string
-	price string
-}
-
 func printSlice(s []*Mac) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
@@ -47,33 +60,67 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("get request")
 
 	// fmt.Println("in handler, its id:", GoID())
-
 }
 
 func launchCrawer() {
 	// maye change to goroutine instead of using callback
-	StartCrawer(func(macs []Mac) {
-		// fmt.Println("get callback:", macs)
-	})
+	newMacs, _ := StartCrawer()
+
+	fmt.Println("get new macs callback:", newMacs)
+
+	// for testing
+	macs, err := GetAllAppleInfo()
+	checkErr(err)
+
+	if reflect.DeepEqual(newMacs, macs) == false {
+		//do something
+		fmt.Println("Old macs:", macs)
+
+		if len(macs) == 0 {
+			fmt.Println("try to insert new macs")
+			InsertAppleInfo(newMacs)
+
+		} else {
+			fmt.Println("try to update macs")
+			UpdateAppleInfo(newMacs)
+		}
+
+		// try to broadcast new Macs message
+		users, _ := GetAllUserID()
+		fmt.Println("get users from db:", users)
+
+		broadcastUpdatedInfo(users, newMacs)
+
+	} else {
+		fmt.Println("Same macs")
+	}
+	// })
 }
 
-// postgres:///grimmer
+func broadcastUpdatedInfo(userList []string, macList []Mac) {
+	summaryStr := "蘋果特價品更新:" + "\n\n"
+	numberOfMacs := len(macList)
+	for i, mac := range macList {
+		if i == (numberOfMacs - 1) {
+			summaryStr = fmt.Sprintf("%s%d. %s. %s  http://www.apple.com%s", summaryStr, i+1, mac.SpecsTitle, mac.Price, mac.SpecsURL)
+		} else {
+			summaryStr = fmt.Sprintf("%s%d. %s. %s  http://www.apple.com%s", summaryStr, i+1, mac.SpecsTitle, mac.Price, mac.SpecsURL) + "\n\n"
+		}
+	}
+	fmt.Println("new summary macs:", summaryStr)
 
-type MacInDB struct {
-	ImageURL    string `json:"imageURL"`
-	SpecsURL    string `json:"specsURL"`
-	SpecsTitle  string `json:"specsTitle"`
-	SpecsDetail string `json:"specsDetail"`
-	Price       string `json:"price"`
+	fmt.Println("broadcast to:", userList)
+
+	if bot != nil {
+		_, err := bot.SendText(userList, summaryStr)
+
+		if err != nil {
+			fmt.Println("send fail, ", err)
+		}
+	}
+	fmt.Println("end broadcast to:", userList)
+
 }
-
-// type Serverslice struct {
-// 	ImageURL    string
-// 	SpecsURL    string
-// 	SpecsTitle  string
-// 	SpecsDetail string
-// 	Price       string
-// }
 
 func describe(i interface{}) {
 	fmt.Printf("(%v, %T)\n", i, i)
@@ -86,26 +133,12 @@ func checkErr(err error) {
 	}
 }
 
-var bot *linebot.Client
-
-//
-var (
-	channelID     int64 = 0
-	channelSecret       = "0"
-	channelMID          = "0"
-)
-
 func main() {
+	var err error
+	bot, err = linebot.NewClient(channelID, channelSecret, channelMID)
+	checkErr(err)
 
-	// fmt.Println("channelid,", channelID)
-	// for testing
-	// MacInfoGroup, err := GetAllAppleInfo()
-	// checkErr(err)
-	// UpdateAppleInfo(MacInfoGroup)
-	// InsertAppleInfo(MacInfoGroup)
-	// fmt.Println("after reading, duplicate from sql")
-
-	launchCrawer()
+	go launchCrawer()
 	ticker := time.NewTicker(time.Second * 60 * 12)
 	go func() {
 		for t := range ticker.C {
@@ -113,14 +146,6 @@ func main() {
 			launchCrawer()
 		}
 	}()
-
-	// for testing
-	// grimmerID := "0"
-	// bot, _ := linebot.NewClient(channelID, channelSecret, channelMID)
-	// _, err := bot.SendText([]string{grimmerID}, "test")
-	// if err != nil {
-	// 	fmt.Println("send fail, ", err)
-	// }
 
 	fmt.Println("main server start")
 

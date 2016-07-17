@@ -5,14 +5,35 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	// "reflect"
 
 	_ "github.com/lib/pq" //why _ ?
 )
 
-// client.query(`UPDATE special_product_table SET product_info = $1`,
+func GetAllUserID() ([]string, error) {
+	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-func UpdateAppleInfo(macInfos []MacInDB) error {
+	rows, err := db.Query("SELECT id FROM user_table")
+	checkErr(err)
+
+	var users []string
+
+	for rows.Next() {
+		var id string
+
+		err = rows.Scan(&id)
+		checkErr(err)
+
+		users = append(users, id)
+	}
+
+	return users, err
+}
+
+func UpdateAppleInfo(macInfos []Mac) error {
 
 	fmt.Println("try update")
 	//  db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
@@ -42,7 +63,7 @@ func UpdateAppleInfo(macInfos []MacInDB) error {
 	return err
 }
 
-func InsertAppleInfo(macInfos []MacInDB) error {
+func InsertAppleInfo(macInfos []Mac) error {
 	fmt.Println("try insert")
 	//  db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
 	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
@@ -51,7 +72,7 @@ func InsertAppleInfo(macInfos []MacInDB) error {
 	}
 
 	// client.query(`INSERT INTO special_product_table(product_info) VALUES($1)`,
-	//array type of json object : []MacInDB, need to converted to appleInfo(byte array type)?
+	//array type of json object : []Mac, need to converted to appleInfo(byte array type)?
 	appleInfo, _ := json.Marshal(macInfos)
 
 	stmt, err := db.Prepare("INSERT INTO special_product_table(product_info) VALUES($1)")
@@ -74,8 +95,7 @@ func InsertAppleInfo(macInfos []MacInDB) error {
 }
 
 // may use queryrow
-func GetAllAppleInfo() ([]MacInDB, error) {
-	fmt.Println("in another file")
+func GetAllAppleInfo() ([]Mac, error) {
 	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
 	if err != nil {
 		fmt.Println("connect fail")
@@ -84,7 +104,7 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 	}
 	defer db.Close()
 
-	fmt.Println("try to query")
+	fmt.Println("try to GetAllAppleInfo")
 
 	// age := 21
 	// rows, err := db.Query("SELECT name FROM users WHERE age = $1", age)
@@ -97,31 +117,27 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 		// terminate the program ?
 		//dial tcp [::1]:5432: getsockopt: connection refused
 
-	} else {
-		fmt.Println("get rows")
 	}
 
 	// fmt.Printf("rows:", "(%v, %T)\n", rows, rows)
 
-	var firstMacInfoGroup []MacInDB
-	// var firstMacInfoGroup2 []MacInDB
-	// var firstMacInfoGroup3 []MacInDB
+	var firstMacInfoGroup []Mac
+	// var firstMacInfoGroup2 []Mac
+	// var firstMacInfoGroup3 []Mac
 
 	for rows.Next() {
-
-		fmt.Println("scan MacInfoGroup rows")
 
 		var s []byte
 
 		// if more than one column, do like this, Scan(&name, &age)
 		if err := rows.Scan(&s); err != nil {
-			log.Fatal(err)
 			fmt.Println("scan error")
+			log.Fatal(err)
 		}
 
 		// or like https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/07.2.md
-		// another struct, s3 {s2 []MacInDB }
-		var s2 []MacInDB
+		// another struct, s3 {s2 []Mac }
+		var s2 []Mac
 
 		// fmt.Printf("s2:", "(%v, %T)\n", s2, s2)
 
@@ -134,7 +150,6 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 		if err != nil {
 			fmt.Println("json error:", err)
 		} else {
-			fmt.Println("scan ok")
 
 			if firstMacInfoGroup == nil {
 				// fmt.Println("before s22", len(s), cap(s))

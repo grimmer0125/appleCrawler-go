@@ -34,20 +34,20 @@ type Foo struct {
 
 func testList() {
 
-	var macs []*Mac
-	printSlice(macs)
-
-	v := Mac{title: "1"}
-	macs = append(macs, &v)
-	printSlice(macs)
-
-	newMac := macs[0]
-	fmt.Println("new mac:", *newMac)
-	(*newMac).title = "2"
-
-	fmt.Println("new mac2:", *newMac)
-
-	fmt.Println("old mac:", v)
+	// var macs []*Mac
+	// printSlice(macs)
+	//
+	// v := Mac{title: "1"}
+	// macs = append(macs, &v)
+	// printSlice(macs)
+	//
+	// newMac := macs[0]
+	// fmt.Println("new mac:", *newMac)
+	// (*newMac).title = "2"
+	//
+	// fmt.Println("new mac2:", *newMac)
+	//
+	// fmt.Println("old mac:", v)
 }
 
 func TestFunctions() {

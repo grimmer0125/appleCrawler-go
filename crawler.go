@@ -13,7 +13,7 @@ import (
 // 	}
 // 	return s
 // }
-func StartCrawer(handler func(macs []Mac)) {
+func StartCrawer() ([]Mac, error) {
 	doc, err := goquery.NewDocument("http://www.apple.com/tw/shop/browse/home/specialdeals/mac")
 	if err != nil {
 		log.Fatal(err)
@@ -40,5 +40,5 @@ func StartCrawer(handler func(macs []Mac)) {
 		macs = append(macs, mac)
 	})
 
-	handler(macs)
+	return macs, nil
 }
