@@ -4,5 +4,8 @@ It is a Line Bot and also an automation Bot to grad the updated information from
 
 It will send the updated informaiton to its Line Friend. 
 
+Scan this QR Code to add it as your Line Friend. 
+
+![Image of LineBotID](https://grimmer.io/images/qr-code-apple-line-bot.png)
 
 
