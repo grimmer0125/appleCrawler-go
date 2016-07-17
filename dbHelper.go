@@ -9,15 +9,15 @@ import (
 	_ "github.com/lib/pq" //why _ ?
 )
 
+var (
+	db *sql.DB
+)
+
 func GetAllUserID() ([]string, error) {
-	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	rows, err := db.Query("SELECT id FROM user_table")
 	checkErr(err)
+	defer rows.Close()
 
 	var users []string
 
@@ -37,10 +37,10 @@ func UpdateAppleInfo(macInfos []Mac) error {
 
 	fmt.Println("try update")
 	//  db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
-	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	appleInfo, _ := json.Marshal(macInfos)
 
@@ -66,10 +66,10 @@ func UpdateAppleInfo(macInfos []Mac) error {
 func InsertAppleInfo(macInfos []Mac) error {
 	fmt.Println("try insert")
 	//  db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
-	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// client.query(`INSERT INTO special_product_table(product_info) VALUES($1)`,
 	//array type of json object : []Mac, need to converted to appleInfo(byte array type)?
@@ -96,13 +96,13 @@ func InsertAppleInfo(macInfos []Mac) error {
 
 // may use queryrow
 func GetAllAppleInfo() ([]Mac, error) {
-	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
-	if err != nil {
-		fmt.Println("connect fail")
-
-		log.Fatal(err) // or panic(err)
-	}
-	defer db.Close()
+	// db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
+	// if err != nil {
+	// 	fmt.Println("connect fail")
+	//
+	// 	log.Fatal(err) // or panic(err)
+	// }
+	// defer db.Close()
 
 	fmt.Println("try to GetAllAppleInfo")
 
@@ -118,6 +118,7 @@ func GetAllAppleInfo() ([]Mac, error) {
 		//dial tcp [::1]:5432: getsockopt: connection refused
 
 	}
+	defer rows.Close()
 
 	// fmt.Printf("rows:", "(%v, %T)\n", rows, rows)
 

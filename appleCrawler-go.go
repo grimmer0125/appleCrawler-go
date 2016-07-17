@@ -1,8 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"reflect"
 	"runtime"
 	"strconv"
@@ -33,11 +36,11 @@ var bot *linebot.Client
 // var pg_url string
 
 //
-var (
-	channelID     int64 = 0
-	channelSecret       = "0"
-	channelMID          = "0"
-)
+// var (
+// 	channelID     int64 = 0
+// 	channelSecret       = "0"
+// 	channelMID          = "0"
+// )
 
 // for debugging, may influence cpu and have side effect
 // http://webcache.googleusercontent.com/search?q=cache:2iyEKmfEot0J:colobu.com/2016/04/01/how-to-get-goroutine-id/+&cd=2&hl=zh-TW&ct=clnk&gl=tw
@@ -56,11 +59,26 @@ func printSlice(s []*Mac) {
 	fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-	fmt.Println("get request")
-
-	// fmt.Println("in handler, its id:", GoID())
+func callbackHandler(w http.ResponseWriter, r *http.Request) {
+	received, err := bot.ParseRequest(r)
+	if err != nil {
+		if err == linebot.ErrInvalidSignature {
+			w.WriteHeader(400)
+		} else {
+			w.WriteHeader(500)
+		}
+		return
+	}
+	for _, result := range received.Results {
+		content := result.Content()
+		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText {
+			text, err := content.TextContent()
+			_, err = bot.SendText([]string{content.From}, "OK "+text.Text)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
 }
 
 func launchCrawer() {
@@ -135,8 +153,28 @@ func checkErr(err error) {
 }
 
 func main() {
+
 	var err error
-	bot, err = linebot.NewClient(channelID, channelSecret, channelMID)
+	if err != nil {
+		fmt.Println("can not open db")
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	db_url := os.Getenv("DATABASE_URL")
+	if db_url == "" {
+		db, err = sql.Open("postgres", (db_url + " sslmode=disable"))
+	} else {
+		db, err = sql.Open("postgres", db_url)
+	}
+
+	strID := os.Getenv("channelID")
+	numID, err := strconv.ParseInt(strID, 10, 64)
+	if err != nil {
+		fmt.Println("Wrong environment setting about ChannelID")
+	}
+	// var err error
+	bot, err = linebot.NewClient(numID, os.Getenv("channelSecret"), os.Getenv("channelMID"))
 	checkErr(err)
 
 	go launchCrawer()
@@ -148,11 +186,18 @@ func main() {
 		}
 	}()
 
-	fmt.Println("main server start")
+	fmt.Println("start web server")
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		// log.Fatal("$PORT must be set")
+		port = "5000"
+	}
+	addr := fmt.Sprintf(":%s", port)
 
 	// https://golang.org/doc/articles/wiki/
-	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/callback", callbackHandler)
+	http.ListenAndServe(addr, nil)
 	fmt.Println("already start server")
 
 	// http.HandleFunc("/callback", callbackHandler)
@@ -160,6 +205,6 @@ func main() {
 	// addr := fmt.Sprintf(":%s", port)
 	// http.ListenAndServe(addr, nil)
 
-	ticker.Stop()
+	// ticker.Stop()
 	fmt.Println("main end")
 }
