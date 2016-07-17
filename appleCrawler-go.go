@@ -83,6 +83,11 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 			checkErr(err)
 			summaryStr := convertMacInfoToString(macs)
 			_, err = bot.SendText([]string{content.From}, summaryStr)
+		} else {
+			if content != nil && content.IsOperation && content.OpType == linebot.OpTypeAddedAsFriend {
+				// InsertUserID
+				InsertUserID(content.From)
+			}
 		}
 	}
 }

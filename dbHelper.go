@@ -33,6 +33,23 @@ func GetAllUserID() ([]string, error) {
 	return users, err
 }
 
+func InsertUserID(userID string) error {
+	fmt.Println("try insert userID")
+
+	stmt, err := db.Prepare("INSERT INTO user_table(id) VALUES($1)")
+	checkErr(err)
+
+	res, err := stmt.Exec(userID)
+	checkErr(err)
+
+	affect, err := res.RowsAffected()
+	checkErr(err)
+
+	fmt.Println("num of real changed:", affect)
+
+	return nil
+}
+
 func UpdateAppleInfo(macInfos []Mac) error {
 
 	fmt.Println("try update")
@@ -64,7 +81,7 @@ func UpdateAppleInfo(macInfos []Mac) error {
 }
 
 func InsertAppleInfo(macInfos []Mac) error {
-	fmt.Println("try insert")
+	fmt.Println("try insert apple info")
 	//  db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
 	// db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
 	// if err != nil {
