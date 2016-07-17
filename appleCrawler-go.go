@@ -86,21 +86,14 @@ func checkErr(err error) {
 }
 
 func main() {
-	// fmt.Println("in main, its id:", GoID())
 
-	mac1 := Mac{"1", "2", "pp"}
-	fmt.Println("mac1:", mac1)
-
-	MacInfoGroup, err := GetAllAppleInfo()
-	checkErr(err)
-	fmt.Println("read mac in db, try duplicate:", MacInfoGroup)
-
-	InsertAppleInfo(MacInfoGroup)
-
-	fmt.Println("afte sql")
+	// for testing
+	// MacInfoGroup, err := GetAllAppleInfo()
+	// checkErr(err)
+	// InsertAppleInfo(MacInfoGroup)
+	// fmt.Println("after reading, duplicate from sql")
 
 	launchCrawer()
-
 	ticker := time.NewTicker(time.Second * 60 * 12)
 	go func() {
 		for t := range ticker.C {

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	// "reflect"
 
 	_ "github.com/lib/pq" //why _ ?
 )
@@ -21,7 +22,6 @@ func InsertAppleInfo(macInfos []MacInDB) error {
 	//array type of json object : []MacInDB, need to converted to appleInfo(byte array type)?
 	appleInfo, _ := json.Marshal(macInfos)
 
-	//插入数据
 	stmt, err := db.Prepare("INSERT INTO special_product_table(product_info) VALUES($1)")
 	checkErr(err)
 
@@ -36,9 +36,9 @@ func InsertAppleInfo(macInfos []MacInDB) error {
 	affect, err := res.RowsAffected()
 	checkErr(err)
 
-	fmt.Println(affect)
+	fmt.Println("num of real changed:", affect)
 
-	return nil
+	return err
 }
 
 // may use queryrow
@@ -71,10 +71,12 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 
 	// fmt.Printf("rows:", "(%v, %T)\n", rows, rows)
 
-	var fistMacInfoGroup []MacInDB
+	var firstMacInfoGroup []MacInDB
+	// var firstMacInfoGroup2 []MacInDB
+
 	for rows.Next() {
 
-		fmt.Println("rows.next")
+		fmt.Println("scan MacInfoGroup rows")
 
 		var s []byte
 
@@ -88,7 +90,7 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 		// another struct, s3 {s2 []MacInDB }
 		var s2 []MacInDB
 
-		fmt.Printf("s2:", "(%v, %T)\n", s2, s2)
+		// fmt.Printf("s2:", "(%v, %T)\n", s2, s2)
 
 		// var jsonBlob = []byte(`[
 		// 	{"imageURL": "Platypus", "specsURL": "monotremata",
@@ -99,16 +101,35 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 		if err != nil {
 			fmt.Println("json error:", err)
 		} else {
-			fmt.Println("scan ok,s2:")
+			fmt.Println("scan ok")
 
-			if fistMacInfoGroup == nil {
-				fmt.Println("assign group:", fistMacInfoGroup)
-				fistMacInfoGroup = s2
+			if firstMacInfoGroup == nil {
+				// fmt.Println("before s22", len(s), cap(s))
+
+				// fmt.Println("before first", len(firstMacInfoGroup), cap(firstMacInfoGroup))
+
+				firstMacInfoGroup = s2
+				// fmt.Println("assign group:")
+
+				// fmt.Println("afterfirst2", len(firstMacInfoGroup), cap(firstMacInfoGroup))
 			}
+			// } else {
+			// 	firstMacInfoGroup2 = s2
+			// }
+
+			// if firstMacInfoGroup != nil && firstMacInfoGroup2 != nil {
+			// 	fmt.Println("try to compare")
+			// 	fmt.Println(reflect.DeepEqual(firstMacInfoGroup, firstMacInfoGroup2))
+			//
+			// 	firstMacInfoGroup[0].ImageURL = "abc"
+			//
+			// 	fmt.Println("try to compare again")
+			// 	fmt.Println(reflect.DeepEqual(firstMacInfoGroup, firstMacInfoGroup2))
+			// }
 		}
 	}
 
-	fmt.Println("final")
+	// fmt.Println("final")
 
-	return fistMacInfoGroup, err
+	return firstMacInfoGroup, err
 }
