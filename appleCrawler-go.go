@@ -1,10 +1,7 @@
 package main
 
 import (
-	"database/sql"
-	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"runtime"
 	"strconv"
@@ -53,6 +50,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func launchCrawer() {
+	// maye change to goroutine instead of using callback
 	StartCrawer(func(macs []Mac) {
 		// fmt.Println("get callback:", macs)
 	})
@@ -60,7 +58,7 @@ func launchCrawer() {
 
 // postgres:///grimmer
 
-type Serverslice struct {
+type MacInDB struct {
 	ImageURL    string `json:"imageURL"`
 	SpecsURL    string `json:"specsURL"`
 	SpecsTitle  string `json:"specsTitle"`
@@ -68,62 +66,23 @@ type Serverslice struct {
 	Price       string `json:"price"`
 }
 
+// type Serverslice struct {
+// 	ImageURL    string
+// 	SpecsURL    string
+// 	SpecsTitle  string
+// 	SpecsDetail string
+// 	Price       string
+// }
+
 func describe(i interface{}) {
 	fmt.Printf("(%v, %T)\n", i, i)
 }
 
-func getAllMacInfo() {
-	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
+func checkErr(err error) {
 	if err != nil {
-		log.Fatal(err) // or panic(err)
-		fmt.Println("connect fail")
-
+		fmt.Println("err:", err)
+		// panic(err)
 	}
-
-	// age := 21
-	// rows, err := db.Query("SELECT name FROM users WHERE age = $1", age)
-	rows, err := db.Query("SELECT product_info FROM special_product_table")
-
-	if err != nil {
-		log.Fatal(err)
-		fmt.Println("no get rows")
-
-	} else {
-		fmt.Println("get rows")
-	}
-
-	for rows.Next() {
-
-		fmt.Println("print row")
-		var s []byte
-		if err := rows.Scan(&s); err != nil {
-			log.Fatal(err)
-			fmt.Println("scan error")
-		}
-
-		// or like https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/07.2.md
-		// another struct, s3 {s2 []Serverslice }
-		var s2 []Serverslice
-
-		// var jsonBlob = []byte(`[
-		// 	{"imageURL": "Platypus", "specsURL": "monotremata",
-		// 	"specsTitle":"cc", "specsDetail": "Monotremata", "Price":"abc"}
-		// ]`)
-		err := json.Unmarshal(s, &s2)
-
-		if err != nil {
-			fmt.Println("json error:", err)
-		}
-
-		// fmt.Println("scan ok,s:", s)
-		fmt.Println("scan ok,s2:", s2)
-	}
-
-	fmt.Println("final")
-
-	//need close
-
-	db.Close()
 }
 
 func main() {
@@ -132,7 +91,11 @@ func main() {
 	mac1 := Mac{"1", "2", "pp"}
 	fmt.Println("mac1:", mac1)
 
-	getAllMacInfo()
+	MacInfoGroup, err := GetAllAppleInfo()
+	checkErr(err)
+	fmt.Println("read mac in db, try duplicate:", MacInfoGroup)
+
+	InsertAppleInfo(MacInfoGroup)
 
 	fmt.Println("afte sql")
 
