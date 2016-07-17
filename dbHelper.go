@@ -10,6 +10,38 @@ import (
 	_ "github.com/lib/pq" //why _ ?
 )
 
+// client.query(`UPDATE special_product_table SET product_info = $1`,
+
+func UpdateAppleInfo(macInfos []MacInDB) error {
+
+	fmt.Println("try update")
+	//  db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
+	db, err := sql.Open("postgres", "user=grimmer dbname=grimmer sslmode=disable")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	appleInfo, _ := json.Marshal(macInfos)
+
+	stmt, err := db.Prepare("UPDATE special_product_table SET product_info = $1")
+	checkErr(err)
+
+	res, err := stmt.Exec(appleInfo)
+	checkErr(err)
+
+	// stmt, err := db.Prepare("update userinfo set username=$1 where uid=$2")
+	// checkErr(err)
+	// res, err := stmt.Exec("astaxieupdate", 1)
+	// checkErr(err)
+
+	affect, err := res.RowsAffected()
+	checkErr(err)
+
+	fmt.Println("num of real changed:", affect)
+
+	return err
+}
+
 func InsertAppleInfo(macInfos []MacInDB) error {
 	fmt.Println("try insert")
 	//  db, err := sql.Open("postgres", "postgres://user:pass@localhost/bookstore")
@@ -73,6 +105,7 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 
 	var firstMacInfoGroup []MacInDB
 	// var firstMacInfoGroup2 []MacInDB
+	// var firstMacInfoGroup3 []MacInDB
 
 	for rows.Next() {
 
@@ -105,18 +138,19 @@ func GetAllAppleInfo() ([]MacInDB, error) {
 
 			if firstMacInfoGroup == nil {
 				// fmt.Println("before s22", len(s), cap(s))
-
 				// fmt.Println("before first", len(firstMacInfoGroup), cap(firstMacInfoGroup))
 
 				firstMacInfoGroup = s2
 				// fmt.Println("assign group:")
-
 				// fmt.Println("afterfirst2", len(firstMacInfoGroup), cap(firstMacInfoGroup))
 			}
-			// } else {
+			// } else if firstMacInfoGroup2 != nil {
 			// 	firstMacInfoGroup2 = s2
+			// } else if firstMacInfoGroup3 != nil {
+			// 	firstMacInfoGroup3 = s2
 			// }
 
+			// test update DB
 			// if firstMacInfoGroup != nil && firstMacInfoGroup2 != nil {
 			// 	fmt.Println("try to compare")
 			// 	fmt.Println(reflect.DeepEqual(firstMacInfoGroup, firstMacInfoGroup2))

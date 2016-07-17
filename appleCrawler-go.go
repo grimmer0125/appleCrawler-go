@@ -90,6 +90,7 @@ func main() {
 	// for testing
 	// MacInfoGroup, err := GetAllAppleInfo()
 	// checkErr(err)
+	// UpdateAppleInfo(MacInfoGroup)
 	// InsertAppleInfo(MacInfoGroup)
 	// fmt.Println("after reading, duplicate from sql")
 
