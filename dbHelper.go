@@ -34,7 +34,7 @@ func GetAllUserID() ([]string, error) {
 }
 
 func InsertUserID(userID string) error {
-	fmt.Println("try insert userID")
+	fmt.Println("try insert userID:", userID)
 
 	stmt, err := db.Prepare("INSERT INTO user_table(id) VALUES($1)")
 	checkErr(err)

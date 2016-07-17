@@ -71,6 +71,10 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, result := range received.Results {
 		content := result.Content()
+
+		fmt.Println("content.from:")
+		describe(content.From)
+
 		if content != nil && content.IsMessage && content.ContentType == linebot.ContentTypeText {
 			text, err := content.TextContent()
 			_, err = bot.SendText([]string{content.From}, "OK "+text.Text)
