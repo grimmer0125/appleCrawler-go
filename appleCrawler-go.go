@@ -15,8 +15,6 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
-// postgres:///grimmer
-
 type User struct {
 	id   string
 	name string
@@ -28,22 +26,11 @@ type Mac struct {
 	Price      string `json:"price"`
 	// 	ImageURL    string `json:"imageURL"`
 	// 	SpecsDetail string `json:"specsDetail"`
-
 }
 
 var bot *linebot.Client
 
-// var pg_url string
-
-//
-// var (
-// 	channelID     int64 = 0
-// 	channelSecret       = "0"
-// 	channelMID          = "0"
-// )
-
 // for debugging, may influence cpu and have side effect
-// http://webcache.googleusercontent.com/search?q=cache:2iyEKmfEot0J:colobu.com/2016/04/01/how-to-get-goroutine-id/+&cd=2&hl=zh-TW&ct=clnk&gl=tw
 func GoID() int {
 	var buf [64]byte
 	n := runtime.Stack(buf[:], false)
@@ -97,17 +84,15 @@ func callbackHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func launchCrawer() {
-	// maye change to goroutine instead of using callback
 	newMacs, _ := StartCrawer()
 
 	fmt.Println("get new macs callback:", newMacs)
 
-	// for testing
 	macs, err := GetAllAppleInfo()
 	checkErr(err)
 
 	if reflect.DeepEqual(newMacs, macs) == false {
-		//do something
+
 		fmt.Println("Old macs:", macs)
 
 		if len(macs) == 0 {
@@ -128,7 +113,6 @@ func launchCrawer() {
 	} else {
 		fmt.Println("Same macs")
 	}
-	// })
 }
 
 func convertMacInfoToString(macList []Mac) string {
@@ -159,7 +143,6 @@ func broadcastUpdatedInfo(userList []string, macList []Mac) {
 		}
 	}
 	fmt.Println("end broadcast to:", userList)
-
 }
 
 func describe(i interface{}) {
@@ -168,8 +151,7 @@ func describe(i interface{}) {
 
 func checkErr(err error) {
 	if err != nil {
-		fmt.Println("err:", err)
-		// panic(err)
+		fmt.Println("err:", err) //or panic(err)
 	}
 }
 
@@ -195,12 +177,6 @@ func main() {
 		fmt.Println("Wrong environment setting about ChannelID")
 	}
 
-	// fmt.Println("numid:", numID)
-	// fmt.Println("secret:", os.Getenv("channelSecret"))
-	// describe(os.Getenv("channelSecret"))
-	// fmt.Println("channelMID:", os.Getenv("channelMID"))
-
-	// var err error
 	bot, err = linebot.NewClient(numID, os.Getenv("channelSecret"), os.Getenv("channelMID"))
 	checkErr(err)
 
@@ -217,20 +193,13 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		// log.Fatal("$PORT must be set")
 		port = "5000"
 	}
 	addr := fmt.Sprintf(":%s", port)
 
-	// https://golang.org/doc/articles/wiki/
 	http.HandleFunc("/callback", callbackHandler)
 	http.ListenAndServe(addr, nil)
 	fmt.Println("already start server")
-
-	// http.HandleFunc("/callback", callbackHandler)
-	// port := os.Getenv("PORT")
-	// addr := fmt.Sprintf(":%s", port)
-	// http.ListenAndServe(addr, nil)
 
 	// ticker.Stop()
 	fmt.Println("main end")
