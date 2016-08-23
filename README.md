@@ -10,7 +10,7 @@ Scan this QR Code to add it as your Line Friend.
 
 ## License
 
-appleCrawler-go is released under the [Apache 2.0 license][license]. Since line-bot-sdk-go is using Apache 2.0 license. 
+appleCrawler-go is released under the [Apache 2.0 license][license].
 
 [license]: LICENSE.md
 
