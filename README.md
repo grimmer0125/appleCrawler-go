@@ -9,9 +9,9 @@ Scan this QR Code to add it as your Line Friend.
 ![Image of LineBotID](https://grimmer.io/images/qr-code-apple-line-bot.png)
 
 ## How to run
-
-1. Install go and setup its PATH
-2. Use either the below ways. 
+1. setup the needed enviornment, such as postgres and Line bot API,  follow the [Steps for development](https://github.com/grimmer0125/appleCrawler-node#steps-for-development) without node/NPM parts. 
+2. Install go and setup its PATH
+3. Use either the below ways. 
     1. Use Visual Studio Code
     2. Use command line    
         1. `go install`
