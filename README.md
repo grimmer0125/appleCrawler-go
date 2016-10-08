@@ -8,6 +8,15 @@ Scan this QR Code to add it as your Line Friend.
 
 ![Image of LineBotID](https://grimmer.io/images/qr-code-apple-line-bot.png)
 
+## How to run
+
+1. Install go and setup its PATH
+2. Use either the below ways. 
+    1. Use Visual Studio Code
+    2. Use command line    
+        1. `go install`
+        2. `appleCrawler-go`
+
 ## License
 
 appleCrawler-go is released under the [Apache 2.0 license][license].
