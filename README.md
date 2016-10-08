@@ -16,7 +16,7 @@ Scan this QR Code to add it as your Line Friend.
 5. Use either the below ways to startup
     1. Use Visual Studio Code
     2. Use command line    
-        1. `go install`(binary file will be the same folder) or `go build` (binary will be saved in the GOPATH/bin)
+        1. `go build`
         2. `appleCrawler-go`
 
 ## License
