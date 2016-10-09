@@ -10,11 +10,11 @@ Scan this QR Code to add it as your Line Friend.
 
 ## How to run
 1. setup the needed enviornment, such as postgres and Line bot API,  follow the [Steps for development](https://github.com/grimmer0125/appleCrawler-node#steps-for-development) without node/NPM parts. 
-2. Install go and setup its PATH
-3. Install dependency tool, Godep, `go get github.com/tools/godep`
-4. Install dependencies, `godep restore`
+2. Install go and setup its PATd    H
+~~3. Install dependency tool, Godep, `go get github.com/tools/godep`~~  
+~~4. Install dependencies, `godep restore`~~
 5. Use either the below ways to startup
-    1. Use Visual Studio Code
+    1. Use Visual Studio Code and [go extension](https://github.com/Microsoft/vscode-go)
     2. Use command line    
         1. `go build`
         2. `appleCrawler-go`
